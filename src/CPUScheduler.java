@@ -64,7 +64,12 @@ public class CPUScheduler {
 		}
 		
 		/*
-		 * Read file
+		 * Input file format:
+		 * 
+		 * proc <priority> <<cpu burst> <io burst>> ... (repeated) <cpu burst>
+		 * sleep <milliseconds>
+		 * stop
+		 * 
 		 */
 		File inputFile = new File(fileName);
 		
