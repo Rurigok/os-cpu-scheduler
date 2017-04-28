@@ -1,8 +1,10 @@
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 public class CPUScheduler {
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		
 		/*
 		 * Possible command line flags:
@@ -63,19 +65,11 @@ public class CPUScheduler {
 			usageExit("Input flag is required");
 		}
 		
-		/*
-		 * Input file format:
-		 * 
-		 * proc <priority> <<cpu burst> <io burst>> ... (repeated) <cpu burst>
-		 * sleep <milliseconds>
-		 * stop
-		 * 
-		 */
-		File inputFile = new File(fileName);
-		
+			
 		/*
 		 * Thread setup
 		 */
+		
 		
 	}
 	
