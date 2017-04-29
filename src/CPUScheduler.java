@@ -1,6 +1,4 @@
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 public class CPUScheduler {
 	
@@ -33,12 +31,14 @@ public class CPUScheduler {
 					usageExit("No algorithm specified. Options: [FIFO|SJF|PR|RR]");
 				}
 				algorithmStr = args[i + 1];
+				i++;
 				break;
 			case "-input":
 				if (i + 1 == args.length) {
 					usageExit("No input file name specified");
 				}
 				fileName = args[i + 1];
+				i++;
 				break;
 			case "-quantum":
 				if (i + 1 == args.length) {
@@ -49,6 +49,7 @@ public class CPUScheduler {
 				} catch (NumberFormatException e) {
 					usageExit("Quantum must be an integer in milliseconds");
 				}
+				i++;
 				break;
 			default:
 				usageExit("Invalid arguments");
@@ -65,11 +66,8 @@ public class CPUScheduler {
 			usageExit("Input flag is required");
 		}
 		
-			
-		/*
-		 * Thread setup
-		 */
-		
+		Simulator simulator = new Simulator(fileName, algorithm, quantum);
+		simulator.startSimulation();
 		
 	}
 	
