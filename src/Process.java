@@ -13,12 +13,12 @@ public class Process {
 	 * Alternating CPU and IO burst numbers, always with an odd length and
 	 * ending with a final CPU burst.
 	 */
-	private volatile int[] bursts;
+	public volatile int[] bursts;
 
 	/**
 	 * Internal index representing which burst should be processed next.
 	 */
-	private volatile int burstIndex = 0;
+	public volatile int burstIndex = 0;
 
 	/**
 	 * True if this process has completed all bursts.

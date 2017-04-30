@@ -34,6 +34,12 @@ public class Simulator {
 	 */
 
 	public Simulator(String fileName, Algorithm algorithm, int quantum) {
+		
+		if (quantum <= 0 && algorithm == Algorithm.RR) {
+			System.err.println("Invalid quantum specified for RR");
+			System.exit(-1);
+		}
+		
 		this.fileName = fileName;
 		this.algorithm = algorithm;
 		readerThread = new FileReader(this, fileName);

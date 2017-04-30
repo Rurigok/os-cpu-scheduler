@@ -40,7 +40,9 @@ public class CPU extends Thread {
 					 * Pick the first process
 					 */
 
-					process = sim.readyQueue.removeFirst();
+					synchronized (sim.readyQueue) {
+						process = sim.readyQueue.removeFirst();
+					}
 					//System.out.println("choose process " + process.processID + " to run");
 
 					try {
@@ -196,7 +198,72 @@ public class CPU extends Thread {
 					
 					break;
 				case RR:
+					/**
+					 * First-come-first-serve, however each burst is limited to
+					 * min(quantum, p.burst()). If there is still burst left, we
+					 * keep the process here and add it back to the end of the
+					 * ready queue
+					 */
 					
+					synchronized (sim.readyQueue) {
+						process = sim.readyQueue.removeFirst();
+					}
+					
+					int burst = Math.min(quantum, process.burst());
+
+					try {
+						Thread.sleep(burst);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					
+					process.turnaroundTime += burst;
+					process.cpuTime += burst;
+					
+					// The time that this process used should be added to the
+					// waiting time of any other processes in the readyQueue
+					synchronized (sim.readyQueue) {
+
+						for (Process p : sim.readyQueue) {
+							p.waitingTime += burst;
+							p.turnaroundTime += burst;
+						}
+
+						//System.out.println("process " + process.processID + " cpu bursted for " + process.burst());
+
+					}
+
+					process.bursts[process.burstIndex] -= burst;
+					
+					if (process.burst() < 0) {
+						System.err.println("Internal error: below 0 burst time");
+						System.exit(-1);
+					} else if (process.burst() == 0) {			
+						// CPU burst is done, send process to ioQueue
+						
+						process.nextBurst();
+						
+						if (process.done) {
+							// process.turnaroundTime = System.currentTimeMillis() -
+							// process.startTimestamp;
+							sim.finishedProcesses++;
+							synchronized (sim.doneList) {
+								sim.doneList.add(process);
+							}
+						} else {
+							synchronized (sim.ioQueue) {
+								sim.ioQueue.add(process);
+							}
+						}
+						
+					} else {
+						// CPU burst isn't done, put this process at the end of the queue
+						
+						synchronized (sim.readyQueue) {
+							sim.readyQueue.add(process);
+						}
+						
+					}		
 					
 					break;
 				}
