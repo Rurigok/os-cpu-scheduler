@@ -4,7 +4,7 @@ import java.nio.file.Files;
 import java.util.LinkedList;
 
 public class FileReader extends Thread {
-	
+
 	File inputFile;
 	Simulator sim;
 
@@ -15,35 +15,42 @@ public class FileReader extends Thread {
 		this.sim = sim;
 		this.inputFile = new File(fileName);
 	}
-	
+
 	@Override
 	public void run() {
-		
+
 		/*
 		 * Input file format:
 		 * 
 		 * proc <priority> <<cpu burst> <io burst>> ... (repeated) <cpu burst>
-		 * sleep <milliseconds> 
-		 * stop
+		 * sleep <milliseconds> stop
 		 * 
 		 */
 		try {
 			Files.lines(inputFile.toPath()).forEachOrdered(line -> {
-				
+
 				line = line.trim();
-				
+
 				if (!line.isEmpty()) {
-				
-					//System.out.println(line);
-					
-					String[] parse = line.split(" ");
-					
+
+					// System.out.println(line);
+
+					String[] parse = line.split("\\s+");
+
 					switch (parse[0]) {
 					case "proc":
-						sim.readyQueue.add(new Process(sim.totalProcesses, line));
-						sim.totalProcesses++;
+
+						synchronized (sim.readyQueue) {
+
+							//System.out.println("added process " + sim.totalProcesses + " to readyqueue");
+							sim.readyQueue.add(new Process(sim.totalProcesses, line));
+							sim.totalProcesses++;
+
+						}
+
 						break;
 					case "sleep":
+
 						int time = Integer.parseInt(parse[1]);
 						try {
 							Thread.sleep(time);
@@ -51,6 +58,7 @@ public class FileReader extends Thread {
 							System.err.println("Interrupted file reader thread while sleeping!");
 							e.printStackTrace();
 						}
+
 						break;
 					case "stop":
 						sim.doneFlag.release();
@@ -59,17 +67,17 @@ public class FileReader extends Thread {
 						System.err.println("Unknown command in input file");
 						System.exit(-1);
 					}
-				
+
 				}
-				
+
 			});
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		sim.doneFlag.release();
-		
+
 	}
 
 }
